@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>65683061758-ec3sgi6vvpb5da4akjmngr2ehngbfnqv.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.65683061758-ec3sgi6vvpb5da4akjmngr2ehngbfnqv</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>65683061758-3c1798541en860f40mvg7m03seo5lfs5.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC5TWMA2ZPBFMAwdwsJyFYPi5zzotPQPrQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>65683061758</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.foodlyRestaurant</string>
+	<key>PROJECT_ID</key>
+	<string>foodly-full-code-flutter</string>
+	<key>STORAGE_BUCKET</key>
+	<string>foodly-full-code-flutter.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:65683061758:ios:075684f4fb6b465cb99eaf</string>
+</dict>
+</plist>
