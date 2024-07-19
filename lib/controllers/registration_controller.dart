@@ -20,7 +20,7 @@ class RegistrationController extends GetxController {
 
   void registration(String model) async {
     setLoading = true;
-    var url = Uri.parse('${Environment.appBaseUrl}//register');
+    var url = Uri.parse('${Environment.appBaseUrl}/register');
 
     try {
       var response = await http.post(
@@ -57,7 +57,6 @@ class RegistrationController extends GetxController {
           colorText: kLightWhite,
           backgroundColor: kRed,
           icon: const Icon(Icons.error));
-
     } finally {
       setLoading = false;
     }
