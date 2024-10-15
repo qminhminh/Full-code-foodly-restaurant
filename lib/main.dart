@@ -18,11 +18,13 @@ import 'package:get_storage/get_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+//sẽ xử lý các thông báo nhận được khi ứng dụng đang ở chế độ nền.
 Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   print(
       "onBackground: ${message.notification?.title}/${message.notification?.body}/${message.notification?.titleLocKey}");
 }
 
+//được sử dụng để quản lý các thông báo cục bộ.
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -70,10 +72,12 @@ class MyApp extends StatelessWidget {
     }
 
     return ScreenUtilInit(
-        useInheritedMediaQuery: true,
+        useInheritedMediaQuery: true, //lấy thôgnt in về kích thước màn hình
         designSize: const Size(428, 926),
-        minTextAdapt: true,
-        splitScreenMode: true,
+        minTextAdapt:
+            true, //đảm bảo rằng văn bản không bị cắt hoặc quá nhỏ trên các màn hình khác nhau.
+        splitScreenMode:
+            true, // Điều này đảm bảo rằng giao diện ứng dụng vẫn hiển thị đúng trên các màn hình chia nhỏ
         builder: (context, child) {
           return GetMaterialApp(
             debugShowCheckedModeBanner: false,
