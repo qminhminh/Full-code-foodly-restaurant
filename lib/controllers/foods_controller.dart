@@ -126,4 +126,48 @@ class FoodsController extends GetxController {
       setLoading = false;
     }
   }
+
+  void updateFood(String foodItem, String id) async {
+    String token = box.read('token');
+    String accessToken = jsonDecode(token);
+
+    Uri url = Uri.parse('${Environment.appBaseUrl}/api/foods/update/$id');
+
+    try {
+      var response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: foodItem,
+      );
+
+      if (response.statusCode == 200) {
+        var data = successResponseFromJson(response.body);
+        setLoading = false;
+        Get.snackbar(data.message, "Product successfully added",
+            colorText: kLightWhite,
+            backgroundColor: kPrimary,
+            icon: const Icon(Icons.add_alert));
+        Get.to(() => const HomePage(),
+            transition: Transition.fadeIn,
+            duration: const Duration(seconds: 2));
+      } else {
+        var data = apiErrorFromJson(response.body);
+
+        Get.snackbar(data.message, "Failed to add product, please try again",
+            backgroundColor: kRed, icon: const Icon(Icons.error));
+      }
+    } catch (e) {
+      setLoading = false;
+
+      Get.snackbar(e.toString(), "Failed to add product, please try again",
+          colorText: kLightWhite,
+          backgroundColor: kRed,
+          icon: const Icon(Icons.error));
+    } finally {
+      setLoading = false;
+    }
+  }
 }

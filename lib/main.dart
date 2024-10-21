@@ -72,27 +72,28 @@ class MyApp extends StatelessWidget {
     }
 
     return ScreenUtilInit(
-        useInheritedMediaQuery: true, //lấy thôgnt in về kích thước màn hình
-        designSize: const Size(428, 926),
-        minTextAdapt:
-            true, //đảm bảo rằng văn bản không bị cắt hoặc quá nhỏ trên các màn hình khác nhau.
-        splitScreenMode:
-            true, // Điều này đảm bảo rằng giao diện ứng dụng vẫn hiển thị đúng trên các màn hình chia nhỏ
-        builder: (context, child) {
-          return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Foodly Resturant App',
-            theme: ThemeData(
-              scaffoldBackgroundColor: kOffWhite,
-              iconTheme: const IconThemeData(color: kDark),
-              primarySwatch: Colors.grey,
-            ),
-            home: defaultHome,
-            navigatorKey: navigatorKey,
-            routes: {
-              '/order_details_page': (context) => const NotificationOrderPage(),
-            },
-          );
-        });
+      useInheritedMediaQuery: true, //lấy thôgnt in về kích thước màn hình
+      designSize: const Size(428, 926),
+      minTextAdapt:
+          true, //đảm bảo rằng văn bản không bị cắt hoặc quá nhỏ trên các màn hình khác nhau.
+      splitScreenMode:
+          true, // Điều này đảm bảo rằng giao diện ứng dụng vẫn hiển thị đúng trên các màn hình chia nhỏ
+      builder: (context, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Foodly Resturant App',
+          theme: ThemeData(
+            scaffoldBackgroundColor: kOffWhite,
+            iconTheme: const IconThemeData(color: kDark),
+            primarySwatch: Colors.grey,
+          ),
+          home: defaultHome,
+          navigatorKey: navigatorKey,
+          routes: {
+            '/order_details_page': (context) => const NotificationOrderPage(),
+          },
+        );
+      },
+    );
   }
 }
