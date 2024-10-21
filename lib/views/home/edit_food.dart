@@ -345,7 +345,7 @@ class _EditFoodPageState extends State<EditFoodPage> {
                     child: CustomButton(
                       text: "D E L E T E",
                       onTap: () {
-                        // Xử lý xóa thực thể món ăn
+                        foodController.confirmDeleteFood(widget.food.id);
                       },
                       color: kRed,
                       btnHieght: 35,

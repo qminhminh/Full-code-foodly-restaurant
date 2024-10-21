@@ -146,23 +146,94 @@ class FoodsController extends GetxController {
       if (response.statusCode == 200) {
         var data = successResponseFromJson(response.body);
         setLoading = false;
-        Get.snackbar(data.message, "Product successfully added",
+        Get.snackbar(data.message, "Product successfully updated",
             colorText: kLightWhite,
             backgroundColor: kPrimary,
             icon: const Icon(Icons.add_alert));
-        Get.to(() => const HomePage(),
-            transition: Transition.fadeIn,
-            duration: const Duration(seconds: 2));
+        Get.back();
       } else {
         var data = apiErrorFromJson(response.body);
 
-        Get.snackbar(data.message, "Failed to add product, please try again",
+        Get.snackbar(data.message, "Failed to update product, please try again",
             backgroundColor: kRed, icon: const Icon(Icons.error));
       }
     } catch (e) {
       setLoading = false;
 
-      Get.snackbar(e.toString(), "Failed to add product, please try again",
+      Get.snackbar(e.toString(), "Failed to update product, please try again",
+          colorText: kLightWhite,
+          backgroundColor: kRed,
+          icon: const Icon(Icons.error));
+    } finally {
+      setLoading = false;
+    }
+  }
+
+  void confirmDeleteFood(String id) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: kPrimary, // Set the background color to kPrimary
+        title: const Text(
+          'Confirm Deletion',
+          style: TextStyle(color: Colors.white), // White text for the title
+        ),
+        content: const Text(
+          'Are you sure you want to delete this product?',
+          style: TextStyle(color: Colors.white), // White text for the content
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // Close the dialog
+            },
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              // Perform the product deletion
+              deleteFood(id);
+              Get.back(); // Close the dialog
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void deleteFood(String id) async {
+    String token = box.read('token');
+    String accessToken = jsonDecode(token);
+
+    Uri url = Uri.parse('${Environment.appBaseUrl}/api/foods/delete/$id');
+
+    try {
+      var response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = successResponseFromJson(response.body);
+        setLoading = false;
+        Get.snackbar(data.message, "Product successfully delete",
+            colorText: kLightWhite,
+            backgroundColor: kPrimary,
+            icon: const Icon(Icons.add_alert));
+        Get.back();
+      } else {
+        var data = apiErrorFromJson(response.body);
+
+        Get.snackbar(data.message, "Failed to delete product, please try again",
+            backgroundColor: kRed, icon: const Icon(Icons.error));
+      }
+    } catch (e) {
+      setLoading = false;
+
+      Get.snackbar(e.toString(), "Failed to delete product, please try again",
           colorText: kLightWhite,
           backgroundColor: kRed,
           icon: const Icon(Icons.error));

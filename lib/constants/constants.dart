@@ -21,7 +21,7 @@ const kOffWhite = Color(0xffF3F4F8);
 double hieght = 926.h;
 double width = 428.w;
 
-const String appBaseUrl = "https://ffoodly.dbestech.com";
+//const String appBaseUrl = "https://ffoodly.dbestech.com";
 // "https://ffoodly.dbestech.com";
 
 

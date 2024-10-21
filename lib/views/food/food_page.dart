@@ -286,7 +286,9 @@ class _FoodPageState extends State<FoodPage> {
             padding: EdgeInsets.symmetric(horizontal: 8.h),
             child: CustomButton(
               text: "D E L E T E",
-              onTap: () {},
+              onTap: () {
+                foodController.confirmDeleteFood(widget.food.id);
+              },
               color: kRed,
               btnHieght: 35,
             ),
