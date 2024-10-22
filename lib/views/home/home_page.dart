@@ -11,6 +11,7 @@ import 'package:foodly_restaurant/constants/constants.dart';
 import 'package:foodly_restaurant/controllers/order_controller.dart';
 import 'package:foodly_restaurant/controllers/restaurant_controller.dart';
 import 'package:foodly_restaurant/views/home/add_foods.dart';
+import 'package:foodly_restaurant/views/home/add_voucher_page.dart';
 import 'package:foodly_restaurant/views/home/foods_page.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/cancelled_orders.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/picked_orders.dart';
@@ -64,55 +65,94 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 12.w),
-                  height: 65.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  height: 125.h,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Stack(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Stack(
+                            children: [
+                              HomeTile(
+                                imagePath: "assets/icons/taco.svg",
+                                text: "Add Foods",
+                                onTap: () {
+                                  Get.to(() => const AddFoodsPage(),
+                                      transition: Transition.fadeIn,
+                                      duration:
+                                          const Duration(milliseconds: 400));
+                                },
+                              ),
+                              const Positioned(
+                                  child: Icon(
+                                AntDesign.pluscircle,
+                                color: Colors.green,
+                              ))
+                            ],
+                          ),
                           HomeTile(
-                            imagePath: "assets/icons/taco.svg",
-                            text: "Add Foods",
+                            imagePath: "assets/icons/wallet.svg",
+                            text: "Wallet",
                             onTap: () {
-                              Get.to(() => const AddFoodsPage(),
+                              Get.to(() => const WalletPage(),
                                   transition: Transition.fadeIn,
-                                  duration:
-                                      const Duration(milliseconds: 400));
+                                  duration: const Duration(milliseconds: 400));
                             },
                           ),
-                          const Positioned(
-                              child: Icon(
-                            AntDesign.pluscircle,
-                            color: Colors.green,
-                          ))
+                          HomeTile(
+                            imagePath: "assets/icons/french_fries.svg",
+                            text: "Foods",
+                            onTap: () {
+                              Get.to(() => const FoodsPage(),
+                                  transition: Transition.fadeIn,
+                                  duration: const Duration(milliseconds: 400));
+                            },
+                          ),
+                          HomeTile(
+                            imagePath: "assets/icons/deliver_food.svg",
+                            text: "Self Delivered",
+                            onTap: () {
+                              Get.to(() => const SelfDeliveredPage(),
+                                  transition: Transition.fadeIn,
+                                  duration: const Duration(milliseconds: 400));
+                            },
+                          ),
                         ],
                       ),
-                      HomeTile(
-                        imagePath: "assets/icons/wallet.svg",
-                        text: "Wallet",
-                        onTap: () {
-                          Get.to(() => const WalletPage(),
-                              transition: Transition.fadeIn,
-                              duration: const Duration(milliseconds: 400));
-                        },
-                      ),
-                      HomeTile(
-                        imagePath: "assets/icons/french_fries.svg",
-                        text: "Foods",
-                        onTap: () {
-                          Get.to(() => const FoodsPage(),
-                              transition: Transition.fadeIn,
-                              duration: const Duration(milliseconds: 400));
-                        },
-                      ),
-                      HomeTile(
-                        imagePath: "assets/icons/deliver_food.svg",
-                        text: "Self Delivered",
-                        onTap: () {
-                          Get.to(() => const SelfDeliveredPage(),
-                              transition: Transition.fadeIn,
-                              duration: const Duration(milliseconds: 400));
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Stack(
+                            children: [
+                              HomeTile(
+                                imagePath: "assets/icons/vouvher.svg",
+                                text: "Add Vouchers",
+                                onTap: () {
+                                  Get.to(() => const AddVoucher(),
+                                      transition: Transition.fadeIn,
+                                      duration:
+                                          const Duration(milliseconds: 400));
+                                },
+                              ),
+                              const Positioned(
+                                  child: Icon(
+                                AntDesign.pluscircle,
+                                color: Colors.green,
+                              ))
+                            ],
+                          ),
+                          HomeTile(
+                            imagePath: "assets/icons/vouchers.svg",
+                            text: "Vouchers",
+                            onTap: () {
+                              Get.to(() => const AddVoucher(),
+                                  transition: Transition.fadeIn,
+                                  duration: const Duration(milliseconds: 400));
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -140,8 +180,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       dividerColor: Colors.transparent,
                       tabAlignment: TabAlignment.start,
                       isScrollable: true,
-                      labelStyle:
-                          appStyle(12, kLightWhite, FontWeight.normal),
+                      labelStyle: appStyle(12, kLightWhite, FontWeight.normal),
                       unselectedLabelColor: Colors.grey.withOpacity(0.7),
                       tabs: const <Widget>[
                         Tab(
@@ -172,17 +211,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Container(
                   color: Colors.transparent,
                   height: hieght * 0.7,
-                  child: TabBarView(
-                      controller: _tabController,
-                      children: const [
-                        NewOrders(),
-                        PreparingOrders(),
-                        ReadyForDelivery(),
-                        PickedOrders(),
-                        SelfDeliveries(),
-                        DeliveredOrders(),
-                        CancelledOrders()
-                      ]),
+                  child:
+                      TabBarView(controller: _tabController, children: const [
+                    NewOrders(),
+                    PreparingOrders(),
+                    ReadyForDelivery(),
+                    PickedOrders(),
+                    SelfDeliveries(),
+                    DeliveredOrders(),
+                    CancelledOrders()
+                  ]),
                 ),
               ],
             ),
