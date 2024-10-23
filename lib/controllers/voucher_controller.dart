@@ -130,7 +130,7 @@ class VoucherController extends GetxController {
           TextButton(
             onPressed: () {
               // Perform the product deletion
-              deleteFood(id);
+              deleteVoucher(id);
               Get.back(); // Close the dialog
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
@@ -140,7 +140,7 @@ class VoucherController extends GetxController {
     );
   }
 
-  void deleteFood(String id) async {
+  void deleteVoucher(String id) async {
     String token = box.read('token');
     String accessToken = jsonDecode(token);
 

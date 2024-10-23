@@ -21,6 +21,7 @@ import 'package:foodly_restaurant/views/home/restaurant_orders/new_orders.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/ready_for_pick_up.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/self_deliveries.dart';
 import 'package:foodly_restaurant/views/home/self_delivered_page.dart';
+import 'package:foodly_restaurant/views/home/vouchers_page.dart';
 import 'package:foodly_restaurant/views/home/wallet_page.dart';
 import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart';
 import 'package:get/get.dart';
@@ -147,7 +148,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             imagePath: "assets/icons/vouchers.svg",
                             text: "Vouchers",
                             onTap: () {
-                              Get.to(() => const AddVoucher(),
+                              Get.to(() => const VouchersPage(),
                                   transition: Transition.fadeIn,
                                   duration: const Duration(milliseconds: 400));
                             },

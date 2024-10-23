@@ -7,11 +7,11 @@ import 'package:foodly_restaurant/common/reusable_text.dart';
 import 'package:foodly_restaurant/constants/constants.dart';
 import 'package:foodly_restaurant/models/foods.dart';
 
-
 class CategoryFoodTile extends StatelessWidget {
   const CategoryFoodTile({
     super.key,
-    required this.food, this.onTap,
+    required this.food,
+    this.onTap,
   });
 
   final Food food;
@@ -142,25 +142,26 @@ class CategoryFoodTile extends StatelessWidget {
             ),
           ),
           Positioned(
-              right: 70.h,
-              top: 6.h,
-              child: Container(
-                width: 19.h,
-                height: 19.h,
-                decoration: const BoxDecoration(
-                    color: kSecondary,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: const Center(
-                    child: Icon(
-                      MaterialCommunityIcons.file_document_edit,
-                      size: 15,
-                      color: kLightWhite,
-                    ),
+            right: 70.h,
+            top: 6.h,
+            child: Container(
+              width: 60.h,
+              height: 60.h,
+              decoration: const BoxDecoration(
+                  color: kSecondary,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: GestureDetector(
+                onTap: () {},
+                child: const Center(
+                  child: Icon(
+                    MaterialCommunityIcons.file_document_edit,
+                    size: 19,
+                    color: kLightWhite,
                   ),
                 ),
-              ))
+              ),
+            ),
+          )
         ],
       ),
     );
