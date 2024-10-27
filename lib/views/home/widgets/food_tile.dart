@@ -145,8 +145,8 @@ class CategoryFoodTile extends StatelessWidget {
             right: 70.h,
             top: 6.h,
             child: Container(
-              width: 60.h,
-              height: 60.h,
+              width: 19.h,
+              height: 19.h,
               decoration: const BoxDecoration(
                   color: kSecondary,
                   borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -155,7 +155,7 @@ class CategoryFoodTile extends StatelessWidget {
                 child: const Center(
                   child: Icon(
                     MaterialCommunityIcons.file_document_edit,
-                    size: 19,
+                    size: 15,
                     color: kLightWhite,
                   ),
                 ),
