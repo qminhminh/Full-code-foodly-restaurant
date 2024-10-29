@@ -1,3 +1,5 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +14,7 @@ import 'package:foodly_restaurant/controllers/order_controller.dart';
 import 'package:foodly_restaurant/controllers/restaurant_controller.dart';
 import 'package:foodly_restaurant/views/home/add_foods.dart';
 import 'package:foodly_restaurant/views/home/add_voucher_page.dart';
+import 'package:foodly_restaurant/views/home/chat_with.dart';
 import 'package:foodly_restaurant/views/home/foods_page.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/cancelled_orders.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/picked_orders.dart';
@@ -212,19 +215,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Container(
                   color: Colors.transparent,
                   height: hieght * 0.7,
-                  child:
-                      TabBarView(controller: _tabController, children: const [
-                    NewOrders(),
-                    PreparingOrders(),
-                    ReadyForDelivery(),
-                    PickedOrders(),
-                    SelfDeliveries(),
-                    DeliveredOrders(),
-                    CancelledOrders()
-                  ]),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: const [
+                      NewOrders(),
+                      PreparingOrders(),
+                      ReadyForDelivery(),
+                      PickedOrders(),
+                      SelfDeliveries(),
+                      DeliveredOrders(),
+                      CancelledOrders(),
+                    ],
+                  ),
                 ),
               ],
             ),
+          ),
+        ),
+        floatingActionButton: Container(
+          margin: const EdgeInsets.only(bottom: 60.0),
+          child: FloatingActionButton(
+            focusColor: kPrimary,
+            hoverColor: kPrimary,
+            onPressed: () {
+              Get.to(
+                () => const ChatWith(),
+                duration: const Duration(milliseconds: 400),
+                transition: Transition.fadeIn,
+              );
+            },
+            child: const Icon(Icons.chat_bubble),
+            backgroundColor: kPrimary,
           ),
         ),
       ),

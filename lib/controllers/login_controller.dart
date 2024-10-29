@@ -104,11 +104,28 @@ class LoginController extends GetxController {
     }
   }
 
-  void logout() {
-    box.erase();
-    defaultHome = const Login();
-    Get.offAll(() => defaultHome,
-        transition: Transition.fade, duration: const Duration(seconds: 2));
+  void logout() async {
+    bool? confirmDelete = await Get.defaultDialog(
+      title: "Confirm Logout",
+      middleText: "Are you sure you want to logout?",
+      backgroundColor: Colors.white,
+      textConfirm: "Yes",
+      textCancel: "No",
+      confirmTextColor: Colors.white,
+      cancelTextColor: Colors.black,
+      onConfirm: () {
+        Get.back(result: true); // Returns true if confirmed
+      },
+      onCancel: () {
+        Get.back(result: false); // Returns false if canceled
+      },
+    );
+    if (confirmDelete == true) {
+      box.erase();
+      defaultHome = const Login();
+      Get.offAll(() => defaultHome,
+          transition: Transition.fade, duration: const Duration(seconds: 2));
+    }
   }
 
   LoginResponse? getUserData() {
