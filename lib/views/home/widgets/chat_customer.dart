@@ -7,15 +7,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
 
-class ChatDriver extends StatefulWidget {
-  const ChatDriver({super.key, required this.driver});
-  final User driver;
+class ChatCustomer extends StatefulWidget {
+  const ChatCustomer({super.key, required this.customer});
+  final User customer;
 
   @override
-  State<ChatDriver> createState() => _ChatDriverState();
+  State<ChatCustomer> createState() => _ChatCustomerState();
 }
 
-class _ChatDriverState extends State<ChatDriver> {
+class _ChatCustomerState extends State<ChatCustomer> {
   final TextEditingController _messageController = TextEditingController();
   final box = GetStorage();
   late final String uid;
@@ -42,14 +42,14 @@ class _ChatDriverState extends State<ChatDriver> {
 
     socket.connect();
     socket.onConnect((_) {
-      // Get.snackbar('Connection', widget.driver.id);
-      socket.emit('join_room_restaurant_driver', {
-        'driverId': widget.driver.id,
+      // Get.snackbar('Connection', widget.customer.id);
+      socket.emit('join_room_restaurant_client', {
+        'customerId': widget.customer.id,
         'restaurantId': uid,
       });
     });
 
-    socket.on('receive_message_driver_res', (data) {
+    socket.on('receive_message_res_client', (data) {
       setState(() {
         messages.add({
           'message': data['message'],
@@ -66,7 +66,7 @@ class _ChatDriverState extends State<ChatDriver> {
       });
     });
 
-    socket.on('delete_message_res_driver', (data) {
+    socket.on('message_deleted', (data) {
       setState(() {
         messages.removeWhere((msg) => msg['_id'] == data['messageId']);
         filteredMessages.removeWhere((msg) => msg['_id'] == data['messageId']);
@@ -77,7 +77,7 @@ class _ChatDriverState extends State<ChatDriver> {
 
   Future<void> _loadChatHistory() async {
     final url = Uri.parse(
-        '${Environment.appBaseUrl}/api/chats/messages-driver-res/$uid/${widget.driver.id}');
+        '${Environment.appBaseUrl}/api/chats/messages/$uid/${widget.customer.id}');
 
     try {
       final response = await http.get(url);
@@ -94,7 +94,10 @@ class _ChatDriverState extends State<ChatDriver> {
           }).toList();
           filteredMessages = List.from(messages);
         });
-        // _markMessagesAsRead(messages.length);
+        socket.emit('mark_as_read_res_client', {
+          'customerId': widget.customer.id,
+          'restaurantId': uid,
+        });
       } else {
         Get.snackbar("Error", "Failed to load chat history");
       }
@@ -106,8 +109,8 @@ class _ChatDriverState extends State<ChatDriver> {
   void _sendMessage() {
     if (_messageController.text.isNotEmpty) {
       final message = _messageController.text;
-      socket.emit('send_message_driver_res', {
-        'driverId': widget.driver.id,
+      socket.emit('send_message_res_client', {
+        'customerId': widget.customer.id,
         'restaurantId': uid,
         'message': message,
         'sender': uid,
@@ -147,8 +150,8 @@ class _ChatDriverState extends State<ChatDriver> {
               onPressed: () {
                 final updatedMessage = _messageController.text;
                 if (updatedMessage.isNotEmpty) {
-                  socket.emit('edit_message_res_driver', {
-                    'driverId': widget.driver.id,
+                  socket.emit('edit_message_res_client', {
+                    'customerId': widget.customer.id,
                     'restaurantId': uid,
                     'messageId': messages[index]['id'],
                     'message': updatedMessage,
@@ -189,8 +192,8 @@ class _ChatDriverState extends State<ChatDriver> {
           actions: [
             TextButton(
               onPressed: () {
-                socket.emit('delete_message_res_driver', {
-                  'driverId': widget.driver.id,
+                socket.emit('delete_message_res_client', {
+                  'customerId': widget.customer.id,
                   'restaurantId': uid,
                   'messageId': message['id'],
                 });
@@ -231,7 +234,7 @@ class _ChatDriverState extends State<ChatDriver> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          widget.driver.username,
+          widget.customer.username,
           style: const TextStyle(color: Colors.black),
         ),
         leading: IconButton(
@@ -267,26 +270,28 @@ class _ChatDriverState extends State<ChatDriver> {
                         ? MainAxisAlignment.end
                         : MainAxisAlignment.start,
                     children: [
-                      PopupMenuButton<int>(
-                        icon: const Icon(Icons.more_vert),
-                        onSelected: (value) {
-                          if (value == 1) {
-                            _editMessage(index);
-                          } else if (value == 2) {
-                            _deleteMessage(index);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 1,
-                            child: Text("Edit"),
-                          ),
-                          const PopupMenuItem(
-                            value: 2,
-                            child: Text("Delete"),
-                          ),
-                        ],
-                      ),
+                      isCustomer
+                          ? PopupMenuButton<int>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 1) {
+                                  _editMessage(index);
+                                } else if (value == 2) {
+                                  _deleteMessage(index);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 1,
+                                  child: Text("Edit"),
+                                ),
+                                const PopupMenuItem(
+                                  value: 2,
+                                  child: Text("Delete"),
+                                ),
+                              ],
+                            )
+                          : const SizedBox(),
                       Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: 4.0, horizontal: 8.0),

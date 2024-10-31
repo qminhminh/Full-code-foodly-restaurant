@@ -10,6 +10,8 @@ import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart'
 
 import 'package:get/get.dart';
 
+import '../chat_with_customer.dart';
+
 class ChatTab extends StatefulHookWidget {
   const ChatTab({super.key});
 
@@ -109,7 +111,7 @@ class _ChatTabState extends State<ChatTab> with TickerProviderStateMixin {
                     child: TabBarView(
                       controller: _tabController,
                       children: const [
-                        ChatWithDriver(),
+                        ChatWithCustomer(),
                         ChatWithDriver(),
                       ],
                     ),
