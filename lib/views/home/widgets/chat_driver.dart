@@ -258,7 +258,7 @@ class _ChatDriverState extends State<ChatDriver> {
               itemBuilder: (context, index) {
                 final message = filteredMessages[index];
                 final isCustomer = message['sender'] == uid;
-                final messageStatus = message['status'];
+
                 return Align(
                   alignment:
                       isCustomer ? Alignment.centerRight : Alignment.centerLeft,
@@ -304,16 +304,6 @@ class _ChatDriverState extends State<ChatDriver> {
                               softWrap: true,
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              messageStatus == 'read' ? 'Read' : 'Unread',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: messageStatus == 'read'
-                                    ? Colors.green
-                                    : Colors.red,
-                              ),
                             ),
                           ],
                         ),
