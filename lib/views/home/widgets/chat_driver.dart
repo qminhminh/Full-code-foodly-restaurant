@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:foodly_restaurant/models/environment.dart';
-import 'package:foodly_restaurant/models/user_chat_model.dart';
-
+import 'package:foodly_restaurant/models/user.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
 
-class Message extends StatefulWidget {
-  const Message({super.key, required this.item});
-  final UserChat item;
+class ChatDriver extends StatefulWidget {
+  const ChatDriver({super.key, required this.driver});
+  final User driver;
 
   @override
-  State<Message> createState() => _ChatRestaurantState();
+  State<ChatDriver> createState() => _ChatDriverState();
 }
 
-class _ChatRestaurantState extends State<Message> {
+class _ChatDriverState extends State<ChatDriver> {
   final TextEditingController _messageController = TextEditingController();
   final box = GetStorage();
-  String? restaurantId;
-
+  late final String uid;
   late IO.Socket socket;
   List<Map<String, dynamic>> messages = [];
   List<Map<String, dynamic>> filteredMessages = [];
@@ -28,9 +26,19 @@ class _ChatRestaurantState extends State<Message> {
   @override
   void initState() {
     super.initState();
-    restaurantId = box.read('restaurantId');
+    uid = box.read("restaurantId").replaceAll('"', '');
     _connectToServer();
     _loadChatHistory();
+  }
+
+  void _markMessagesAsRead() {
+    // Chỉ đánh dấu tin nhắn là đã đọc nếu uid khác với id của người gửi
+    if (uid != widget.driver.id && uid != socket.id) {
+      socket.emit('mark_as_read_driver', {
+        'driverId': widget.driver.id,
+        'restaurantId': uid,
+      });
+    }
   }
 
   void _connectToServer() {
@@ -44,26 +52,32 @@ class _ChatRestaurantState extends State<Message> {
 
     socket.connect();
     socket.onConnect((_) {
-      //Get.snackbar('Connection', 'Connected to server');
-      socket.emit('join_room', {
-        'restaurantId': restaurantId,
-        'customerId': widget.item.customerId.id,
+      // Get.snackbar('Connection', widget.driver.id);
+      socket.emit('join_room_driver', {
+        'driverId': widget.driver.id,
+        'restaurantId': uid,
       });
+      _markMessagesAsRead();
     });
 
-    socket.on('receive_message', (data) {
+    socket.on('receive_message_driver', (data) {
       setState(() {
         messages.add({
           'message': data['message'],
           'sender': data['sender'],
-          'id': data['_id'], // Ensure we receive ID for new messages
+          'id': data['_id'],
+          'isRead': data['isRead'] ?? 'unread',
         });
         filteredMessages.add({
           'message': data['message'],
           'sender': data['sender'],
-          'id': data['_id'], // Ensure we receive ID for new messages
+          'id': data['_id'],
+          'isRead': data['isRead'] ?? 'unread',
         });
       });
+      if (data['sender'] != uid) {
+        _markMessagesAsRead();
+      }
     });
 
     socket.on('message_deleted', (data) {
@@ -77,9 +91,7 @@ class _ChatRestaurantState extends State<Message> {
 
   Future<void> _loadChatHistory() async {
     final url = Uri.parse(
-      '${Environment.appBaseUrl}/api/chats/messages/$restaurantId/${widget.item.customerId.id}'
-          .replaceAll('"', ''),
-    );
+        '${Environment.appBaseUrl}/api/chats/messages-driver/${widget.driver.id}/$uid');
 
     try {
       final response = await http.get(url);
@@ -96,6 +108,7 @@ class _ChatRestaurantState extends State<Message> {
           }).toList();
           filteredMessages = List.from(messages);
         });
+        // _markMessagesAsRead(messages.length);
       } else {
         Get.snackbar("Error", "Failed to load chat history");
       }
@@ -107,21 +120,21 @@ class _ChatRestaurantState extends State<Message> {
   void _sendMessage() {
     if (_messageController.text.isNotEmpty) {
       final message = _messageController.text;
-      socket.emit('send_message', {
-        'restaurantId': restaurantId,
-        'customerId': widget.item.customerId.id,
+      socket.emit('send_message_driver', {
+        'driverId': widget.driver.id,
+        'restaurantId': uid,
         'message': message,
-        'sender': restaurantId,
+        'sender': uid,
       });
       setState(() {
         messages.add({
           'message': message,
-          'sender': restaurantId,
+          'sender': uid,
           'id': '', // Thêm trình giữ chỗ cho các tin nhắn mới
         });
         filteredMessages.add({
           'message': message,
-          'sender': restaurantId,
+          'sender': uid,
           'id': '', // Add a placeholder for new messages
         });
         _messageController.clear();
@@ -148,9 +161,9 @@ class _ChatRestaurantState extends State<Message> {
               onPressed: () {
                 final updatedMessage = _messageController.text;
                 if (updatedMessage.isNotEmpty) {
-                  socket.emit('edit_message', {
-                    'restaurantId': restaurantId,
-                    'customerId': widget.item.customerId.id,
+                  socket.emit('edit_message_driver', {
+                    'driverId': widget.driver.id,
+                    'restaurantId': uid,
                     'messageId': messages[index]['id'],
                     'message': updatedMessage,
                   });
@@ -190,9 +203,9 @@ class _ChatRestaurantState extends State<Message> {
           actions: [
             TextButton(
               onPressed: () {
-                socket.emit('delete_message', {
-                  'restaurantId': restaurantId,
-                  'customerId': widget.item.customerId.id,
+                socket.emit('delete_message_driver', {
+                  'driverId': widget.driver.id,
+                  'restaurantId': uid,
                   'messageId': message['id'],
                 });
 
@@ -232,7 +245,7 @@ class _ChatRestaurantState extends State<Message> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          widget.item.customerId.username,
+          widget.driver.username,
           style: const TextStyle(color: Colors.black),
         ),
         leading: IconButton(
@@ -258,7 +271,8 @@ class _ChatRestaurantState extends State<Message> {
               itemCount: filteredMessages.length,
               itemBuilder: (context, index) {
                 final message = filteredMessages[index];
-                final isCustomer = message['sender'] == restaurantId;
+                final isCustomer = message['sender'] == uid;
+                final messageStatus = message['status'];
                 return Align(
                   alignment:
                       isCustomer ? Alignment.centerRight : Alignment.centerLeft,
@@ -287,9 +301,7 @@ class _ChatRestaurantState extends State<Message> {
                           ),
                         ],
                       ),
-                      const SizedBox(width: 2),
                       Container(
-                        width: 100,
                         margin: const EdgeInsets.symmetric(
                             vertical: 4.0, horizontal: 8.0),
                         padding: const EdgeInsets.all(12.0),
@@ -298,15 +310,23 @@ class _ChatRestaurantState extends State<Message> {
                               isCustomer ? Colors.blue[100] : Colors.grey[300],
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                message['message'],
-                                softWrap: true, // Bật tính năng xuống dòng
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              message['message'],
+                              softWrap: true,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              messageStatus == 'read' ? 'Read' : 'Unread',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: messageStatus == 'read'
+                                    ? Colors.green
+                                    : Colors.red,
                               ),
                             ),
                           ],

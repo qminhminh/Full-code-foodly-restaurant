@@ -14,7 +14,6 @@ import 'package:foodly_restaurant/controllers/order_controller.dart';
 import 'package:foodly_restaurant/controllers/restaurant_controller.dart';
 import 'package:foodly_restaurant/views/home/add_foods.dart';
 import 'package:foodly_restaurant/views/home/add_voucher_page.dart';
-import 'package:foodly_restaurant/views/home/chat_with.dart';
 import 'package:foodly_restaurant/views/home/foods_page.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/cancelled_orders.dart';
 import 'package:foodly_restaurant/views/home/restaurant_orders/picked_orders.dart';
@@ -27,6 +26,7 @@ import 'package:foodly_restaurant/views/home/self_delivered_page.dart';
 import 'package:foodly_restaurant/views/home/vouchers_page.dart';
 import 'package:foodly_restaurant/views/home/wallet_page.dart';
 import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart';
+import 'package:foodly_restaurant/views/home/widgets/chat_tab.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulHookWidget {
@@ -239,7 +239,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             hoverColor: kPrimary,
             onPressed: () {
               Get.to(
-                () => const ChatWith(),
+                () => const ChatTab(),
                 duration: const Duration(milliseconds: 400),
                 transition: Transition.fadeIn,
               );
