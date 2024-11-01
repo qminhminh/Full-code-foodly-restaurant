@@ -14,16 +14,17 @@ class ProfileAppBar extends StatelessWidget {
         automaticallyImplyLeading: false,
         actions: [
           Padding(
-              padding: EdgeInsets.only(right: 16.w),
-              child: GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                child: const Icon(
-                  AntDesign.closecircleo,
-                  size: 24,
-                ),
-              )),
+            padding: EdgeInsets.only(right: 16.w),
+            child: GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: const Icon(
+                AntDesign.closecircleo,
+                size: 24,
+              ),
+            ),
+          ),
         ]);
   }
 }

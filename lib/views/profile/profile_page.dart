@@ -9,6 +9,7 @@ import 'package:foodly_restaurant/controllers/login_response.dart';
 import 'package:foodly_restaurant/views/auth/widgets/login_redirect.dart';
 import 'package:foodly_restaurant/views/home/wallet_page.dart';
 import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart';
+import 'package:foodly_restaurant/views/profile/widgets/edit_profile.dart';
 import 'package:foodly_restaurant/views/profile/widgets/profile_appbar.dart';
 import 'package:foodly_restaurant/views/profile/widgets/tile_widget.dart';
 import 'package:get/get.dart';
@@ -87,7 +88,14 @@ class ProfilePage extends StatelessWidget {
                                 ],
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Get.to(
+                                      () => EditProfile(
+                                            user: user!,
+                                          ),
+                                      transition: Transition.fade,
+                                      duration: const Duration(seconds: 2));
+                                },
                                 child: Padding(
                                   padding: EdgeInsets.only(top: 12.0.h),
                                   child: const Icon(Feather.edit, size: 18),
