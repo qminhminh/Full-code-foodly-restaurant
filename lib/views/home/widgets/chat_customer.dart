@@ -59,6 +59,14 @@ class _ChatCustomerState extends State<ChatCustomer> {
     }
   }
 
+  void _sendUnreadNotification(Map<String, dynamic> data) {
+    socket.emit('send_unread_notification_res_to_client', {
+      'customerId': widget.customer.id,
+      'restaurantId': uid,
+      'message': data['message'],
+    });
+  }
+
   void _connectToServer() {
     socket = IO.io(
       'http://192.168.137.1:5000',
@@ -92,7 +100,9 @@ class _ChatCustomerState extends State<ChatCustomer> {
           'isRead': data['isRead'] ?? 'unread',
         });
       });
-
+      if (data['isRead'] == 'unread') {
+        _sendUnreadNotification(data);
+      }
       _markMessagesAsRead();
       // _loadChatHistory();
     });
@@ -108,14 +118,20 @@ class _ChatCustomerState extends State<ChatCustomer> {
 
     socket.on('messages_marked_as_read', (data) {
       setState(() {
-        for (var msg in messages) {
-          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
-            msg['isRead'] = 'read';
+        // Cập nhật trạng thái của các tin nhắn trong messages
+        for (var messageId in data['messageIds']) {
+          final index = messages.indexWhere((msg) => msg['id'] == messageId);
+          if (index != -1) {
+            messages[index]['isRead'] = 'read';
           }
         }
-        for (var msg in filteredMessages) {
-          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
-            msg['isRead'] = 'read';
+
+        // Cập nhật trạng thái của các tin nhắn trong filteredMessages
+        for (var messageId in data['messageIds']) {
+          final index =
+              filteredMessages.indexWhere((msg) => msg['id'] == messageId);
+          if (index != -1) {
+            filteredMessages[index]['isRead'] = 'read';
           }
         }
       });
@@ -357,35 +373,37 @@ class _ChatCustomerState extends State<ChatCustomer> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             // Thêm widget trạng thái đọc ở đây
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                // Kiểm tra xem tin nhắn đã đọc hay chưa
-                                Icon(
-                                  message['isRead'] == 'read'
-                                      ? Icons.check
-                                      : Icons.check_box_outline_blank,
-                                  size: 16.0,
-                                  color: message['isRead'] == 'read'
-                                      ? Colors.green
-                                      : Colors.grey,
-                                ),
-                                const SizedBox(
-                                    width:
-                                        4.0), // Khoảng cách giữa icon và text
-                                Text(
-                                  message['isRead'] == 'read'
-                                      ? 'read'
-                                      : 'unread',
-                                  style: TextStyle(
-                                    color: message['isRead'] == 'read'
-                                        ? Colors.green
-                                        : Colors.grey,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            isCustomer
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // Kiểm tra xem tin nhắn đã đọc hay chưa
+                                      Icon(
+                                        message['isRead'] == 'read'
+                                            ? Icons.check
+                                            : Icons.check_box_outline_blank,
+                                        size: 16.0,
+                                        color: message['isRead'] == 'read'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(
+                                          width:
+                                              4.0), // Khoảng cách giữa icon và text
+                                      Text(
+                                        message['isRead'] == 'read'
+                                            ? 'read'
+                                            : 'unread',
+                                        style: TextStyle(
+                                          color: message['isRead'] == 'read'
+                                              ? Colors.green
+                                              : Colors.grey,
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(),
                           ],
                         ),
                       ),
