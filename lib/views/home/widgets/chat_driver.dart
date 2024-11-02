@@ -28,7 +28,43 @@ class _ChatDriverState extends State<ChatDriver> {
     super.initState();
     uid = box.read("restaurantId").replaceAll('"', '');
     _connectToServer();
-    _loadChatHistory();
+    _loadChatHistory().then((_) {
+      _markMessagesAsRead();
+    });
+  }
+
+  void _markMessagesAsRead() {
+    // Lọc ra những tin nhắn có sender khác với uid của người dùng
+    final unreadMessages = messages
+        .where((msg) => msg['sender'] != uid && msg['isRead'] == 'unread')
+        .toList();
+
+    if (unreadMessages.isNotEmpty) {
+      socket.emit('mark_as_read_res_driver', {
+        'driverId': widget.driver.id,
+        'restaurantId': uid,
+      });
+
+      setState(() {
+        for (var msg in unreadMessages) {
+          msg['isRead'] =
+              'read'; // Cập nhật các tin nhắn đủ điều kiện là đã đọc
+        }
+        for (var msg in filteredMessages) {
+          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
+            msg['isRead'] = 'read';
+          }
+        }
+      });
+    }
+  }
+
+  void _sendUnreadNotification(Map<String, dynamic> data) {
+    socket.emit('send_unread_notification_res_to_driver', {
+      'driverId': widget.driver.id,
+      'restaurantId': uid,
+      'message': data['message'],
+    });
   }
 
   void _connectToServer() {
@@ -64,6 +100,10 @@ class _ChatDriverState extends State<ChatDriver> {
           'isRead': data['isRead'] ?? 'unread',
         });
       });
+      if (data['isRead'] == 'unread') {
+        _sendUnreadNotification(data);
+      }
+      _markMessagesAsRead();
     });
 
     socket.on('delete_message_res_driver', (data) {
@@ -71,7 +111,28 @@ class _ChatDriverState extends State<ChatDriver> {
         messages.removeWhere((msg) => msg['_id'] == data['messageId']);
         filteredMessages.removeWhere((msg) => msg['_id'] == data['messageId']);
       });
-      Get.snackbar("Success", "Message deleted successfully");
+      _loadChatHistory();
+    });
+
+    socket.on('messages_marked_as_read', (data) {
+      setState(() {
+        // Cập nhật trạng thái của các tin nhắn trong messages
+        for (var messageId in data['messageIds']) {
+          final index = messages.indexWhere((msg) => msg['id'] == messageId);
+          if (index != -1) {
+            messages[index]['isRead'] = 'read';
+          }
+        }
+
+        // Cập nhật trạng thái của các tin nhắn trong filteredMessages
+        for (var messageId in data['messageIds']) {
+          final index =
+              filteredMessages.indexWhere((msg) => msg['id'] == messageId);
+          if (index != -1) {
+            filteredMessages[index]['isRead'] = 'read';
+          }
+        }
+      });
     });
   }
 
@@ -90,6 +151,7 @@ class _ChatDriverState extends State<ChatDriver> {
               'message': msg['message'],
               'sender': msg['sender'],
               'id': msg['_id'] ?? '',
+              'isRead': msg['isRead'] ?? 'unread',
             };
           }).toList();
           filteredMessages = List.from(messages);
@@ -125,6 +187,7 @@ class _ChatDriverState extends State<ChatDriver> {
         });
         _messageController.clear();
       });
+      _loadChatHistory();
     }
   }
 
@@ -154,6 +217,7 @@ class _ChatDriverState extends State<ChatDriver> {
                     'message': updatedMessage,
                   });
                   setState(() {
+                    _loadChatHistory();
                     messages[index]['message'] = updatedMessage;
                     filteredMessages[index]['message'] =
                         updatedMessage; // Update filteredMessages too
@@ -267,26 +331,28 @@ class _ChatDriverState extends State<ChatDriver> {
                         ? MainAxisAlignment.end
                         : MainAxisAlignment.start,
                     children: [
-                      PopupMenuButton<int>(
-                        icon: const Icon(Icons.more_vert),
-                        onSelected: (value) {
-                          if (value == 1) {
-                            _editMessage(index);
-                          } else if (value == 2) {
-                            _deleteMessage(index);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 1,
-                            child: Text("Edit"),
-                          ),
-                          const PopupMenuItem(
-                            value: 2,
-                            child: Text("Delete"),
-                          ),
-                        ],
-                      ),
+                      isCustomer
+                          ? PopupMenuButton<int>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 1) {
+                                  _editMessage(index);
+                                } else if (value == 2) {
+                                  _deleteMessage(index);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 1,
+                                  child: Text("Edit"),
+                                ),
+                                const PopupMenuItem(
+                                  value: 2,
+                                  child: Text("Delete"),
+                                ),
+                              ],
+                            )
+                          : const SizedBox(),
                       Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: 4.0, horizontal: 8.0),
@@ -305,6 +371,37 @@ class _ChatDriverState extends State<ChatDriver> {
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
+                            isCustomer
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // Kiểm tra xem tin nhắn đã đọc hay chưa
+                                      Icon(
+                                        message['isRead'] == 'read'
+                                            ? Icons.check
+                                            : Icons.check_box_outline_blank,
+                                        size: 16.0,
+                                        color: message['isRead'] == 'read'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(
+                                          width:
+                                              4.0), // Khoảng cách giữa icon và text
+                                      Text(
+                                        message['isRead'] == 'read'
+                                            ? 'read'
+                                            : 'unread',
+                                        style: TextStyle(
+                                          color: message['isRead'] == 'read'
+                                              ? Colors.green
+                                              : Colors.grey,
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(),
                           ],
                         ),
                       ),
