@@ -28,7 +28,35 @@ class _ChatCustomerState extends State<ChatCustomer> {
     super.initState();
     uid = box.read("restaurantId").replaceAll('"', '');
     _connectToServer();
-    _loadChatHistory();
+    _loadChatHistory().then((_) {
+      _markMessagesAsRead();
+    });
+  }
+
+  void _markMessagesAsRead() {
+    // Lọc ra những tin nhắn có sender khác với uid của người dùng
+    final unreadMessages = messages
+        .where((msg) => msg['sender'] != uid && msg['isRead'] == 'unread')
+        .toList();
+
+    if (unreadMessages.isNotEmpty) {
+      socket.emit('mark_as_read_res_client', {
+        'customerId': widget.customer.id,
+        'restaurantId': uid,
+      });
+
+      setState(() {
+        for (var msg in unreadMessages) {
+          msg['isRead'] =
+              'read'; // Cập nhật các tin nhắn đủ điều kiện là đã đọc
+        }
+        for (var msg in filteredMessages) {
+          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
+            msg['isRead'] = 'read';
+          }
+        }
+      });
+    }
   }
 
   void _connectToServer() {
@@ -64,6 +92,9 @@ class _ChatCustomerState extends State<ChatCustomer> {
           'isRead': data['isRead'] ?? 'unread',
         });
       });
+
+      _markMessagesAsRead();
+      // _loadChatHistory();
     });
 
     socket.on('message_deleted', (data) {
@@ -71,7 +102,23 @@ class _ChatCustomerState extends State<ChatCustomer> {
         messages.removeWhere((msg) => msg['_id'] == data['messageId']);
         filteredMessages.removeWhere((msg) => msg['_id'] == data['messageId']);
       });
-      Get.snackbar("Success", "Message deleted successfully");
+      _loadChatHistory();
+      //Get.snackbar("Success", "Message deleted successfully");
+    });
+
+    socket.on('messages_marked_as_read', (data) {
+      setState(() {
+        for (var msg in messages) {
+          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
+            msg['isRead'] = 'read';
+          }
+        }
+        for (var msg in filteredMessages) {
+          if (msg['sender'] != uid && msg['isRead'] == 'unread') {
+            msg['isRead'] = 'read';
+          }
+        }
+      });
     });
   }
 
@@ -90,13 +137,10 @@ class _ChatCustomerState extends State<ChatCustomer> {
               'message': msg['message'],
               'sender': msg['sender'],
               'id': msg['_id'] ?? '',
+              'isRead': msg['isRead'] ?? 'unread',
             };
           }).toList();
           filteredMessages = List.from(messages);
-        });
-        socket.emit('mark_as_read_res_client', {
-          'customerId': widget.customer.id,
-          'restaurantId': uid,
         });
       } else {
         Get.snackbar("Error", "Failed to load chat history");
@@ -128,6 +172,7 @@ class _ChatCustomerState extends State<ChatCustomer> {
         });
         _messageController.clear();
       });
+      _loadChatHistory();
     }
   }
 
@@ -157,6 +202,7 @@ class _ChatCustomerState extends State<ChatCustomer> {
                     'message': updatedMessage,
                   });
                   setState(() {
+                    _loadChatHistory();
                     messages[index]['message'] = updatedMessage;
                     filteredMessages[index]['message'] =
                         updatedMessage; // Update filteredMessages too
@@ -309,6 +355,36 @@ class _ChatCustomerState extends State<ChatCustomer> {
                               softWrap: true,
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
+                            ),
+                            // Thêm widget trạng thái đọc ở đây
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                // Kiểm tra xem tin nhắn đã đọc hay chưa
+                                Icon(
+                                  message['isRead'] == 'read'
+                                      ? Icons.check
+                                      : Icons.check_box_outline_blank,
+                                  size: 16.0,
+                                  color: message['isRead'] == 'read'
+                                      ? Colors.green
+                                      : Colors.grey,
+                                ),
+                                const SizedBox(
+                                    width:
+                                        4.0), // Khoảng cách giữa icon và text
+                                Text(
+                                  message['isRead'] == 'read'
+                                      ? 'read'
+                                      : 'unread',
+                                  style: TextStyle(
+                                    color: message['isRead'] == 'read'
+                                        ? Colors.green
+                                        : Colors.grey,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
