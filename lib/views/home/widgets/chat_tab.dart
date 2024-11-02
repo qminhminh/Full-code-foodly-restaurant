@@ -7,9 +7,7 @@ import 'package:foodly_restaurant/constants/constants.dart';
 import 'package:foodly_restaurant/controllers/tab_controller.dart';
 import 'package:foodly_restaurant/views/home/chat_with_driver.dart';
 import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart';
-
 import 'package:get/get.dart';
-
 import '../chat_with_customer.dart';
 
 class ChatTab extends StatefulHookWidget {
@@ -41,6 +39,13 @@ class _ChatTabState extends State<ChatTab> with TickerProviderStateMixin {
           elevation: .4,
           backgroundColor: kLightWhite,
           centerTitle: true,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () {
+              Get.back(result: true);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
           actions: [
             IconButton(
               onPressed: () {},

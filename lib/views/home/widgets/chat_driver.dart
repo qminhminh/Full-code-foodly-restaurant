@@ -300,19 +300,11 @@ class _ChatDriverState extends State<ChatDriver> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Get.back(result: true);
           },
           icon: const Icon(Icons.arrow_back),
           color: Colors.black,
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Search function
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ],
       ),
       body: Column(
         children: [

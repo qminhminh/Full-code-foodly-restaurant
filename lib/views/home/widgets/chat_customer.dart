@@ -1,3 +1,5 @@
+// ignore_for_file: library_prefixes
+
 import 'package:flutter/material.dart';
 import 'package:foodly_restaurant/models/environment.dart';
 import 'package:foodly_restaurant/models/user.dart';
@@ -301,19 +303,11 @@ class _ChatCustomerState extends State<ChatCustomer> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Get.back(result: true);
           },
           icon: const Icon(Icons.arrow_back),
           color: Colors.black,
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Search function
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ],
       ),
       body: Column(
         children: [
