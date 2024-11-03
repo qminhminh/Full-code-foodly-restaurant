@@ -40,6 +40,7 @@ void main() async {
   await GetStorage.init();
   await dotenv.load(fileName: Environment.fileName);
   await NotificationService().initialize(flutterLocalNotificationsPlugin);
+
   runApp(
     const MyApp(),
   );

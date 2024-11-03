@@ -33,6 +33,7 @@ import 'package:foodly_restaurant/views/home/widgets/chat_tab.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulHookWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -53,6 +54,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<dynamic> messages = [];
   bool isLoading = false;
   String? error;
+
+  Future<void> requestPermissionsWithPrompt() async {
+    PermissionStatus locationStatus = await Permission.location.request();
+    if (locationStatus.isDenied) {
+      print("Người dùng đã từ chối quyền vị trí.");
+    } else if (locationStatus.isPermanentlyDenied) {
+      openAppSettings(); // Mở cài đặt ứng dụng nếu bị từ chối vĩnh viễn
+    }
+
+    PermissionStatus notificationStatus =
+        await Permission.notification.request();
+    if (notificationStatus.isDenied) {
+      print("Người dùng đã từ chối quyền thông báo.");
+    } else if (notificationStatus.isPermanentlyDenied) {
+      openAppSettings(); // Mở cài đặt ứng dụng nếu bị từ chối vĩnh viễn
+    }
+  }
 
   // Hàm fetch dữ liệu
   Future<void> fetchData() async {
@@ -87,6 +105,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    requestPermissionsWithPrompt();
     fetchData();
   }
 
@@ -106,7 +125,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final orderController = Get.put(OrdersController());
     _tabController.animateTo(orderController.tabIndex);
     final countUnreadMessage = messages.isNotEmpty
-        ? messages.where((msg) => msg['isRead'] == 'unread').toList()
+        ? messages
+            .where((msg) => msg['isRead'] == 'unread' && msg['sender'] != uid)
+            .toList()
         : [];
     return DefaultTabController(
       length: 7,

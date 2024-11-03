@@ -60,7 +60,7 @@ class ChatTileDriver extends HookWidget {
     // Lấy tin nhắn cuối cùng chưa đọc
     final lastUnreadMessage = messages.value.isNotEmpty
         ? messages.value.lastWhere(
-            (msg) => msg['isRead'] == 'unread',
+            (msg) => msg['isRead'] == 'unread' && msg['sender'] != uid,
             orElse: () => null,
           )
         : null;
