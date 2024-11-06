@@ -72,7 +72,7 @@ class _ChatCustomerState extends State<ChatCustomer> {
 
   void _connectToServer() {
     socket = IO.io(
-      'http://192.168.137.1:5000',
+      'https://full-code-server-chat-foodly.onrender.com',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

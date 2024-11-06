@@ -11,6 +11,7 @@ import 'package:foodly_restaurant/views/home/wallet_page.dart';
 import 'package:foodly_restaurant/views/home/widgets/back_ground_container.dart';
 import 'package:foodly_restaurant/views/profile/widgets/edit_profile.dart';
 import 'package:foodly_restaurant/views/profile/widgets/profile_appbar.dart';
+import 'package:foodly_restaurant/views/profile/widgets/seting_page.dart';
 import 'package:foodly_restaurant/views/profile/widgets/tile_widget.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -137,7 +138,11 @@ class ProfilePage extends StatelessWidget {
                           leading: MaterialIcons.rss_feed,
                         ),
                         TilesWidget(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(() => const SettingProfile(),
+                                transition: Transition.fade,
+                                duration: const Duration(seconds: 2));
+                          },
                           title: "Settings",
                           leading: AntDesign.setting,
                         ),
