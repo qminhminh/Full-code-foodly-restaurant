@@ -1,4 +1,4 @@
-// ignore_for_file: unused_import, file_names
+// ignore_for_file: unused_import, file_names, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

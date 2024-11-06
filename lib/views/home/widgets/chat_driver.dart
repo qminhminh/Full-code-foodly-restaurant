@@ -1,4 +1,7 @@
+// ignore_for_file: library_prefixes
+
 import 'package:flutter/material.dart';
+import 'package:foodly_restaurant/constants/constants.dart';
 import 'package:foodly_restaurant/models/environment.dart';
 import 'package:foodly_restaurant/models/user.dart';
 import 'package:get/get.dart';
@@ -293,7 +296,7 @@ class _ChatDriverState extends State<ChatDriver> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: kPrimary,
         title: Text(
           widget.driver.username,
           style: const TextStyle(color: Colors.black),
@@ -370,9 +373,9 @@ class _ChatDriverState extends State<ChatDriver> {
                                       // Kiểm tra xem tin nhắn đã đọc hay chưa
                                       Icon(
                                         message['isRead'] == 'read'
-                                            ? Icons.check
-                                            : Icons.check_box_outline_blank,
-                                        size: 16.0,
+                                            ? Icons.check_box
+                                            : Icons.not_interested_sharp,
+                                        size: 12.0,
                                         color: message['isRead'] == 'read'
                                             ? Colors.green
                                             : Colors.grey,
@@ -388,7 +391,7 @@ class _ChatDriverState extends State<ChatDriver> {
                                           color: message['isRead'] == 'read'
                                               ? Colors.green
                                               : Colors.grey,
-                                          fontSize: 12.0,
+                                          fontSize: 10.0,
                                         ),
                                       ),
                                     ],
@@ -403,27 +406,62 @@ class _ChatDriverState extends State<ChatDriver> {
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            color: Colors.grey[200],
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message...',
-                      border: InputBorder.none,
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 4.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius:
+                        BorderRadius.circular(25), // Bo tròn nhiều hơn
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _messageController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type a message...',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send),
+              ),
+              const SizedBox(width: 8), // Khoảng cách giữa ô nhập và nút gửi
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue, // Đổi màu nền nút gửi
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.4),
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.send, color: Colors.white),
                   onPressed: _sendMessage,
                 ),
-              ],
-            ),
-          ),
+              ),
+            ],
+          )
         ],
       ),
     );

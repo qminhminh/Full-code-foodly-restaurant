@@ -6,7 +6,7 @@
     <application
         android:label="Foodly Restaurant"
         android:name="${applicationName}"
-        android:icon="@mipmap/images">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
